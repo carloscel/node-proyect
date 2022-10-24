@@ -1,17 +1,33 @@
 const {request, response} = require('express');
 const User = require('../models/user');
 const bcryptjs = require('bcryptjs');
-const { ValidExistEmail } = require('../helpers/db-validators');
 //const {validationResult} = require('express-validator')
 
+/*
 const usersGet = (req = request, res = response) => {
+  //Busquedas para traer todo lo que hay en la base datos.
+
+  const {name} = req.params
   
-  const body = req.body;
+  User.find({name : {"$regex": name, "$options": "i"}}, (err, users) =>  {
     res.json({
-      ok: true,
-      messaje: 'api get dev',
-      body 
+      
+      users 
     }) 
+  })
+}
+*/
+
+const usersGet = (req = request, res = response) => {
+  //Busquedas para traer todo lo que hay en la base datos.
+
+  const {id} = req.params
+  User.find(id ? {_id:id} : {}, (err, users) =>  {
+    res.json({
+      
+      users 
+    }) 
+  })
 }
 
 const usersPost = async (req = request, res = response) => {
@@ -38,7 +54,7 @@ const usersPost = async (req = request, res = response) => {
     })
   }
   */
-  //ValidExistEmail(user)
+ 
   //bcryptjs
   const salt = bcryptjs.genSaltSync();
   user.password = bcryptjs.hashSync(password, salt);
@@ -54,18 +70,38 @@ const usersPost = async (req = request, res = response) => {
   }) 
 }
 
-const usersPut = (req = request, res = response) => {
+const usersPut = async (req = request, res = response) => {
+
+  const {id} = req.params;
+  const {password, email, ...rest} = req.body;
+
+  if(password){
+    const salt = bcryptjs.genSaltSync();
+    rest.password = bcryptjs.hashSync(password, salt);
+  }
+
+  const user = await User.findByIdAndUpdate(id, rest)
+
   res.json({
     ok: true,
     messaje: 'api put',
-    
+    user
   }) 
 }
 
-const usersDelete = (req = request, res = response) => {
+const usersDelete = async (req = request, res = response) => {
+
+  const {id} = req.params;
+  //Delete User
+  //const userDelete = await User.findByIdAndDelete(id); 
+
+  //change status
+  const userDelete = await User.findByIdAndUpdate(id, {status: false})
+
   res.json({
-    ok: true,
-    messaje: 'api delete',
+    
+    messaje: 'se eliminó el usuario',
+    userDelete
     
   }) 
 }

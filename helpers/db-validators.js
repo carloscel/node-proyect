@@ -8,16 +8,22 @@ const isValidRole = async (role = '') => {
 	}
 };
 
-const ValidExistEmail = async (user) => {
-	const {email} = user;
-  	
+const ValidExistEmail = async (email = '') => {
+	  	
 	const existEmail = await User.findOne({email});
-	console.log(existEmail.status)
-	if(existEmail.status){
-		
+	
+	if(existEmail){
 		throw new Error("Este correo ya ha sido registardo en la base de datos");
 	}
 	
 }
 
-module.exports = { isValidRole, ValidExistEmail };
+const isValidUserById = async (id = '') => {
+	const existId = await User.findById(id);
+	
+	if(!existId){
+		throw new Error("El Id no ha sido registardo en la base de datos");
+	}
+}
+
+module.exports = { isValidRole, ValidExistEmail, isValidUserById };
